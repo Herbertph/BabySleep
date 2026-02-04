@@ -32,8 +32,8 @@
 		9A7EB6EE2F3292690082E436 = {
 			isa = PBXGroup;
 			children = (
-				9A7EB6F92F3292690082E436 /* BabySleep */,
 				9A7EB6F82F3292690082E436 /* Products */,
+				9A7EB6F92F3292690082E436 /* BabySleep */,
 			);
 			sourceTree = "<group>";
 		};
