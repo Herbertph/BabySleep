@@ -29,6 +29,7 @@ struct HomeView: View {
                 Divider()
 
                 if let sleep = lastSleep {
+
                     Text("Last sleep")
                         .font(.headline)
 
@@ -38,6 +39,12 @@ struct HomeView: View {
 
                     Text("Wake ups: \(sleep.wakeUps)")
                         .foregroundColor(.secondary)
+
+                    SleepComparisonView(
+                        sleepEntry: sleep,
+                        babyAge: profile.ageInMonths
+                    )
+
                 } else {
                     Text("No sleep data yet.")
                         .foregroundColor(.secondary)

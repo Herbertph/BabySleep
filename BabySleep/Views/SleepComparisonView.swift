@@ -1,0 +1,64 @@
+import SwiftUI
+
+struct SleepComparisonView: View {
+
+    let sleepEntry: SleepEntry
+    let babyAge: Int
+
+    private let rangeService = SleepRangeService()
+
+    var body: some View {
+        VStack(spacing: 16) {
+
+            Text("Sleep Comparison")
+                .font(.headline)
+
+            if let range = rangeService.range(for: babyAge) {
+
+                Text(String(format: "Your baby slept %.1f hours", sleepEntry.totalSleepHours))
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Text("Expected range for this age:")
+                    .foregroundColor(.secondary)
+
+                Text("\(range.min)h – \(range.max)h")
+                    .font(.body)
+
+                Divider()
+
+                Text(feedbackMessage(for: sleepEntry.totalSleepHours, range: range))
+                    .multilineTextAlignment(.center)
+                    .font(.body)
+            } else {
+                Text("No comparison data available.")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+
+    private func feedbackMessage(for hours: Double, range: SleepRange) -> String {
+        if hours < range.min {
+            return "This is below the average range, and that can be exhausting. Many babies go through phases like this — you are not doing anything wrong."
+        } else if hours > range.max {
+            return "Your baby slept more than average. Enjoy it — this is completely normal at this age."
+        } else {
+            return "This amount of sleep is well within the normal range for this age. Your baby’s sleep looks healthy."
+        }
+    }
+}
+
+#Preview {
+    SleepComparisonView(
+        sleepEntry: SleepEntry(
+            id: UUID(),
+            startTime: Date().addingTimeInterval(-12 * 3600),
+            endTime: Date(),
+            wakeUps: 2
+        ),
+        babyAge: 6
+    )
+}
