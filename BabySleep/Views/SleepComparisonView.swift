@@ -12,32 +12,41 @@ struct SleepComparisonView: View {
 
             Text("Sleep Comparison")
                 .font(.headline)
+                .foregroundColor(Color.primaryBlue)
 
             if let range = rangeService.range(for: babyAge) {
 
-                Text(String(format: "Your baby slept %.1f hours", sleepEntry.totalSleepHours))
-                    .font(.title2)
+                Text("Your baby slept \(sleepEntry.formattedDuration)")
+                    .font(.title3)
                     .fontWeight(.semibold)
+                    .foregroundColor(.primary)
 
                 Text("Expected range for this age:")
                     .foregroundColor(.secondary)
 
-                Text("\(range.min)h – \(range.max)h")
+                Text("\(Int(range.min))h – \(Int(range.max))h")
                     .font(.body)
+                    .foregroundColor(.primary)
 
                 Divider()
 
-                Text(feedbackMessage(for: sleepEntry.totalSleepHours, range: range))
-                    .multilineTextAlignment(.center)
-                    .font(.body)
+                // FRASE EMPÁTICA (AGORA VISÍVEL)
+                Text(feedbackMessage(
+                    for: sleepEntry.totalSleepInterval / 3600,
+                    range: range
+                ))
+                .font(.body)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+
             } else {
                 Text("No comparison data available.")
                     .foregroundColor(.secondary)
             }
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
+        .background(Color.cardBackground)
+        .cornerRadius(16)
     }
 
     private func feedbackMessage(for hours: Double, range: SleepRange) -> String {
@@ -55,10 +64,10 @@ struct SleepComparisonView: View {
     SleepComparisonView(
         sleepEntry: SleepEntry(
             id: UUID(),
-            startTime: Date().addingTimeInterval(-12 * 3600),
+            startTime: Date().addingTimeInterval(-8 * 3600),
             endTime: Date(),
             wakeUps: 2
         ),
-        babyAge: 6
+        babyAge: 13
     )
 }

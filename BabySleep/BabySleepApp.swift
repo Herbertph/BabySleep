@@ -4,7 +4,7 @@ import SwiftUI
 struct BabySleepApp: App {
     var body: some Scene {
         WindowGroup {
-            RootView()
+            SplashView()
         }
     }
 }

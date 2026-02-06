@@ -4,46 +4,107 @@ struct AddSleepView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var startTime: Date = Date().addingTimeInterval(-8 * 3600)
-    @State private var endTime: Date = Date()
+    @State private var startDate: Date = Date()
+    @State private var endDate: Date = Date()
     @State private var wakeUps: Int = 0
+    @State private var showPaywall = false
 
     private let storage = SleepStorageService()
+    private let usageLimit = UsageLimitService()
 
     var body: some View {
-        VStack(spacing: 24) {
+        NavigationStack {
 
-            Text("Add Sleep")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+            VStack(spacing: 20) {
 
-            DatePicker("Sleep start", selection: $startTime, displayedComponents: .hourAndMinute)
-            DatePicker("Wake up", selection: $endTime, displayedComponents: .hourAndMinute)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Sleep started")
+                        .font(.headline)
 
-            Stepper("Wake ups: \(wakeUps)", value: $wakeUps, in: 0...10)
+                    DatePicker(
+                        "",
+                        selection: $startDate,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    .datePickerStyle(.compact)
+                    .labelsHidden()
+                }
 
-            Button(action: {
-                let entry = SleepEntry(
-                    id: UUID(),
-                    startTime: startTime,
-                    endTime: endTime,
-                    wakeUps: wakeUps
+                Divider()
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Woke up")
+                        .font(.headline)
+
+                    DatePicker(
+                        "",
+                        selection: $endDate,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    .datePickerStyle(.compact)
+                    .labelsHidden()
+                }
+
+                Divider()
+
+                Stepper(
+                    "Wake ups: \(wakeUps)",
+                    value: $wakeUps,
+                    in: 0...10
                 )
 
-                storage.save(entry)
-                dismiss()
-            }) {
-                Text("Save")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-            }
+                Text("\(usageLimit.remaining()) free nights left")
+                    .foregroundColor(.secondary)
 
-            Spacer()
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Add Sleep")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+
+                // Cancel
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+
+                // CTA FIXO NO FUNDO (IGUAL HOME)
+                ToolbarItem(placement: .bottomBar) {
+                    Button(
+                        usageLimit.canAddMore()
+                        ? "Save Sleep"
+                        : "Unlock full access"
+                    ) {
+                        onBottomButtonTapped()
+                    }
+                }
+            }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView()
+            }
         }
-        .padding()
+    }
+
+    // MARK: - Actions
+    private func onBottomButtonTapped() {
+
+        guard usageLimit.canAddMore() else {
+            showPaywall = true
+            return
+        }
+
+        let entry = SleepEntry(
+            id: UUID(),
+            startTime: startDate,
+            endTime: endDate,
+            wakeUps: wakeUps
+        )
+
+        storage.save(entry)
+        usageLimit.increment()
+        dismiss()
     }
 }
 

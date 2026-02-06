@@ -10,18 +10,13 @@ struct HomeView: View {
     private let sleepStorage = SleepStorageService()
 
     var body: some View {
-        NavigationStack {
+
+        ScrollView {
             VStack(spacing: 20) {
 
-                Text("Welcome")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-
-                if let name = profile.name {
-                    Text("How is \(name)'s sleep?")
-                } else {
-                    Text("How is your baby's sleep?")
-                }
+                Text("How is \(profile.name ?? "your baby's") sleep?")
+                    .font(.title2)
+                    .fontWeight(.semibold)
 
                 Text("Age: \(profile.ageInMonths) months")
                     .foregroundColor(.secondary)
@@ -33,9 +28,9 @@ struct HomeView: View {
                     Text("Last sleep")
                         .font(.headline)
 
-                    Text(String(format: "%.1f hours", sleep.totalSleepHours))
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                    Text(sleep.formattedDuration)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
 
                     Text("Wake ups: \(sleep.wakeUps)")
                         .foregroundColor(.secondary)
@@ -50,28 +45,39 @@ struct HomeView: View {
                         .foregroundColor(.secondary)
                 }
 
-                Spacer()
-
+                // BOTÃO VISÍVEL DENTRO DA TELA
                 Button(action: {
                     showAddSleep = true
                 }) {
                     Text("Add Sleep")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.primaryBlue)
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(14)
                 }
+                .padding(.top, 24)
+
+                Spacer(minLength: 40)
             }
             .padding()
-            .onAppear {
-                loadLastSleep()
+        }
+        .navigationTitle("Welcome")
+        .toolbar {
+            // BOTÃO SIMPLES (Apple-style)
+            ToolbarItem(placement: .bottomBar) {
+                Button("Add Sleep") {
+                    showAddSleep = true
+                }
             }
-            .sheet(isPresented: $showAddSleep, onDismiss: {
-                loadLastSleep()
-            }) {
-                AddSleepView()
-            }
+        }
+        .onAppear {
+            loadLastSleep()
+        }
+        .sheet(isPresented: $showAddSleep, onDismiss: {
+            loadLastSleep()
+        }) {
+            AddSleepView()
         }
     }
 
@@ -81,5 +87,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(profile: BabyProfile(name: "Alex", ageInMonths: 6))
+    HomeView(profile: BabyProfile(name: "Lilly", ageInMonths: 13))
 }

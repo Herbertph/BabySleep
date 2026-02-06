@@ -6,9 +6,14 @@ struct SleepEntry: Codable, Identifiable {
     let endTime: Date
     let wakeUps: Int
 
-    var totalSleepHours: Double {
-        let interval = endTime.timeIntervalSince(startTime)
-        return interval / 3600
+    var totalSleepInterval: TimeInterval {
+        endTime.timeIntervalSince(startTime)
+    }
+
+    var formattedDuration: String {
+        let totalMinutes = Int(totalSleepInterval / 60)
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        return "\(hours)h \(String(format: "%02d", minutes))min"
     }
 }
-
